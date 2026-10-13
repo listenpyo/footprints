@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#1f6f8b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>발자취 — 전단지 배포 팀 지도</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+<link rel="stylesheet" href="css/app.css">
+<script type="importmap">
+{ "imports": { "leaflet": "./js/leaflet-esm-shim.js", "maplibre-gl": "https://cdn.jsdelivr.net/npm/maplibre-gl@6.3.0/dist/maplibre-gl.mjs" } }
+</script>
+</head>
+<body>
+
+<header id="topbar">
+  <button id="btn-menu" class="icon-btn" title="메뉴" aria-label="메뉴">☰</button>
+  <div id="title-wrap">
+    <div id="title" data-i18n="app.title">발자취</div>
+    <div id="subtitle"><span id="session-badge">—</span> · <span id="me-badge">—</span></div>
+  </div>
+  <div id="gps" class="gps gps-off" title="GPS"><span class="dot"></span><span id="gps-text">GPS</span></div>
+</header>
+
+<div id="map"></div>
+
+<div id="hud">
+  <div id="hud-dist">0 m</div>
+  <div id="hud-ov" class="hidden">⚠ <span id="hud-ov-m">0</span> m</div>
+</div>
+
+<div id="draw-bar" class="hidden">
+  <span id="draw-hint" data-i18n="draw.hint">지도를 탭해서 구역 꼭짓점을 찍으세요 (3개 이상)</span>
+  <button id="draw-undo" class="btn small" data-i18n="draw.undo">되돌리기</button>
+  <button id="draw-done" class="btn small primary" data-i18n="draw.done">완료</button>
+  <button id="draw-cancel" class="btn small" data-i18n="draw.cancel">취소</button>
+</div>
+
+<div id="route-bar" class="hidden">
+  <span data-i18n="route.tapStart">출발점을 지도에서 탭하세요</span>
+  <button id="route-here" class="btn small" data-i18n="poi.here">내 위치에</button>
+  <button id="route-cancel" class="btn small" data-i18n="draw.cancel">취소</button>
+</div>
+
+<div id="nav-bar" class="hidden">
+  <div id="nav-row">
+    <div id="nav-ico">↑</div>
+    <div id="nav-main"><div id="nav-text">—</div><div id="nav-sub">—</div></div>
+    <button id="nav-close" class="icon-btn" aria-label="안내 종료">✕</button>
+  </div>
+  <div id="nav-actions">
+    <button id="nav-recalc" class="btn small" data-i18n="route.recalc">현재 위치에서 재계산</button>
+    <button id="nav-toggle-route" class="btn small" data-i18n="layer.routeToggle">경로 숨기기</button>
+    <button id="nav-mini" class="btn small" data-i18n="nav.mini">접기</button>
+  </div>
+</div>
+
+<div id="sim-bar" class="hidden">
+  <div id="sim-row"><span id="sim-title">▶</span><span id="sim-text">—</span><button id="sim-close" class="icon-btn" aria-label="시뮬레이션 종료">✕</button></div>
+  <div id="sim-walkers"></div>
+  <div id="sim-actions"><button class="btn small" data-speed="10">×10</button><button class="btn small" data-speed="30">×30</button><button class="btn small" data-speed="100">×100</button><button class="btn small" id="sim-restart" data-i18n="sim.restart">처음부터</button></div>
+</div>
+
+<div id="layers-pop" class="hidden">
+  <div class="section-title" data-i18n="layer.title">지도에 표시</div>
+  <label><input type="checkbox" data-layer="route"> <span data-i18n="layer.route">경로</span></label>
+  <label><input type="checkbox" data-layer="steps"> <span data-i18n="layer.steps">회전 지점 · 출발/도착</span></label>
+  <label><input type="checkbox" data-layer="myTrack"> <span data-i18n="layer.myTrack">내 발자취</span></label>
+  <label><input type="checkbox" data-layer="otherTracks"> <span data-i18n="layer.otherTracks">팀원 발자취</span></label>
+  <label><input type="checkbox" data-layer="streets"> <span data-i18n="layer.streets">골목 (완료 색)</span></label>
+  <label><input type="checkbox" data-layer="blds"> <span data-i18n="layer.blds">집 점</span></label>
+  <label><input type="checkbox" data-layer="pois"> <span data-i18n="layer.pois">표시 (お断り 등)</span></label>
+  <label><input type="checkbox" data-layer="zones"> <span data-i18n="layer.zones">구역 테두리</span></label>
+  <label><input type="checkbox" data-layer="members"> <span data-i18n="layer.members">팀원 위치</span></label>
+</div>
+
+<div id="poi-bar" class="hidden">
+  <span data-i18n="poi.hint">표시할 위치를 지도에서 탭하세요</span>
+  <button id="poi-here" class="btn small" data-i18n="poi.here">내 위치에</button>
+  <button id="poi-cancel" class="btn small" data-i18n="draw.cancel">취소</button>
+</div>
+
+<div id="fabs">
+  <button id="fab-layers" class="fab" title="표시 켜기/끄기" aria-label="표시 켜기/끄기">👁</button>
+  <button id="fab-locate" class="fab" title="내 위치 따라가기" aria-label="내 위치 따라가기">◎</button>
+  <button id="fab-track" class="fab fab-main" aria-label="기록 시작">
+    <span class="fab-ico">▶</span><span class="fab-lbl" data-i18n="track.start">기록 시작</span>
+  </button>
+  <button id="fab-zone" class="fab" title="구역 그리기" aria-label="구역 그리기">▰</button>
+  <button id="fab-poi" class="fab" title="표시 남기기" aria-label="표시 남기기">📍</button>
+</div>
+
+<section id="sheet" class="collapsed">
+  <div id="sheet-handle"><span></span></div>
+  <nav id="tabs">
+    <button data-tab="team" class="active" data-i18n="tab.team">팀</button>
+    <button data-tab="zones" data-i18n="tab.zones">구역</button>
+    <button data-tab="pois" data-i18n="tab.pois">표시</button>
+    <button data-tab="settings" data-i18n="tab.settings">설정</button>
+  </nav>
+  <div id="sheet-body">
+    <div class="tab-pane active" id="tab-team"></div>
+    <div class="tab-pane" id="tab-zones"></div>
+    <div class="tab-pane" id="tab-pois"></div>
+    <div class="tab-pane" id="tab-settings"></div>
+  </div>
+</section>
+
+<div id="toast-wrap"></div>
+
+<div id="modal-wrap" class="hidden">
+  <div id="modal-backdrop"></div>
+  <div id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/store.js"></script>
+<script src="js/estimate.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/route.js"></script>
+<script src="js/app.js"></script>
+<!-- 벡터 기본지도(OpenFreeMap)를 Leaflet 아래에 깔기 위한 어댑터. MapLibre v6 은 ESM 전용이라 모듈로 읽는다. -->
+<script type="module">
+  import { maplibreGL } from 'https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.4/dist/leaflet-maplibre-gl.mjs';
+  window.__ofm = maplibreGL;
+  window.dispatchEvent(new Event('ofm-ready'));
+</script>
+</body>
+</html>

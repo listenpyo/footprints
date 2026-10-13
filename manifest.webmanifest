@@ -1,0 +1,12 @@
+{
+  "name": "발자취 — 전단지 배포 팀 지도",
+  "short_name": "발자취",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f6f8b",
+  "lang": "ko",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

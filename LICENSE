@@ -1,0 +1,40 @@
+MIT License
+
+Copyright (c) 2026 listenpyo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+This software loads, but does not include, the following third-party components
+at run time. Their licenses apply to them, not to this repository:
+
+- Leaflet 1.9.4 (BSD-2-Clause) — https://leafletjs.com
+- MapLibre GL JS 6.3.0 (BSD-3-Clause) — https://maplibre.org
+- @maplibre/maplibre-gl-leaflet 0.1.4 (ISC) — https://github.com/maplibre/maplibre-gl-leaflet
+- @mapbox/vector-tile 2.0.3, pbf 4.0.1 (BSD-3-Clause) — https://github.com/mapbox
+- Firebase JS SDK (Apache-2.0), optional
+
+Map data shown in the app (not included in this repository):
+
+- 地理院タイル / 基盤地図情報 — 国土地理院コンテンツ利用規約 (出典: 国土地理院)
+- OpenFreeMap tiles — © OpenMapTiles © OpenStreetMap contributors (ODbL)
+- OpenStreetMap data via Overpass API — © OpenStreetMap contributors (ODbL)
+
+See LICENSES.md for details.

@@ -1,0 +1,5 @@
+# 로컬 개발 도구 설정 (Claude 앱 미리보기 서버)
+.claude/
+# OS
+.DS_Store
+Thumbs.db
